@@ -1,8 +1,7 @@
-console.log("EpidMonitor mobile loaded");
+console.log("EpidMonitor Mobile loaded");
 
+if ("serviceWorker" in navigator) {
 
-if ('serviceWorker' in navigator) {
-
-navigator.serviceWorker.register('/static/sw.js');
+navigator.serviceWorker.register("/static/sw.js");
 
 }
