@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
+import { getMessaging, getToken } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyARhnBGMJtjgWhQLg5Vfmx4BhLfWQdxOXQ",
@@ -7,19 +7,18 @@ const firebaseConfig = {
   projectId: "epidmonitorimate-push",
   storageBucket: "epidmonitorimate-push.firebasestorage.app",
   messagingSenderId: "311713349541",
-  appId: "1:311713349541:web:4070db41ea46d83e2ab24c",
-  measurementId: "G-RQ37KYTZJN"
+  appId: "1:311713349541:web:4070db41ea46d83e2ab24c"
 };
 
 const app = initializeApp(firebaseConfig);
 const messaging = getMessaging(app);
 
-async function initPush() {
+window.subscribePush = async function () {
 
   const permission = await Notification.requestPermission();
 
   if (permission !== "granted") {
-    console.log("Push запрещён");
+    alert("Уведомления запрещены");
     return;
   }
 
@@ -29,22 +28,13 @@ async function initPush() {
 
     console.log("PUSH TOKEN:", token);
 
-    // отправляем токен на сервер
-    fetch("/save_push_token", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({token: token})
-    });
+    alert("Push включён!");
 
   } catch (e) {
-    console.log("Push error", e);
+
+    console.log("Push error:", e);
+    alert("Ошибка push");
+
   }
-}
 
-initPush();
-
-onMessage(messaging, (payload) => {
-  console.log("Message received:", payload);
-});
+};
