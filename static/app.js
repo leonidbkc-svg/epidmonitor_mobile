@@ -1,69 +1,50 @@
-const publicKey = "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEvEAweJTo/7VIVeizOqiBYbiMKIwi6/CCAA9lKjQdAvMNu4kfJnkHkTn6Q32U6IybbTLJC+1w8gxmuP8QIlSezA==";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getMessaging, getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-messaging.js";
 
-function openModule(name){
-    alert('Модуль "' + name + '" находится в разработке');
+const firebaseConfig = {
+  apiKey: "AIzaSyARhnBGMJtjgWhQLg5Vfmx4BhLfWQdxOXQ",
+  authDomain: "epidmonitorimate-push.firebaseapp.com",
+  projectId: "epidmonitorimate-push",
+  storageBucket: "epidmonitorimate-push.firebasestorage.app",
+  messagingSenderId: "311713349541",
+  appId: "1:311713349541:web:4070db41ea46d83e2ab24c",
+  measurementId: "G-RQ37KYTZJN"
+};
+
+const app = initializeApp(firebaseConfig);
+const messaging = getMessaging(app);
+
+async function initPush() {
+
+  const permission = await Notification.requestPermission();
+
+  if (permission !== "granted") {
+    console.log("Push запрещён");
+    return;
+  }
+
+  try {
+
+    const token = await getToken(messaging);
+
+    console.log("PUSH TOKEN:", token);
+
+    // отправляем токен на сервер
+    fetch("/save_push_token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({token: token})
+    });
+
+  } catch (e) {
+    console.log("Push error", e);
+  }
 }
 
-function urlBase64ToUint8Array(base64String) {
+initPush();
 
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-
-    const base64 = (base64String + padding)
-        .replace(/\-/g, '+')
-        .replace(/_/g, '/');
-
-    const rawData = atob(base64);
-
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-
-    return outputArray;
-}
-
-async function subscribePush(){
-
-    try{
-
-        const permission = await Notification.requestPermission();
-
-        if(permission !== "granted"){
-            alert("Уведомления не разрешены");
-            return;
-        }
-
-        const registration = await navigator.serviceWorker.register("/static/sw.js");
-
-        await navigator.serviceWorker.ready;
-
-        const subscription = await registration.pushManager.subscribe({
-
-            userVisibleOnly:true,
-            applicationServerKey:urlBase64ToUint8Array(publicKey)
-
-        });
-
-        await fetch("/subscribe",{
-
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify(subscription)
-
-        });
-
-        alert("Уведомления успешно включены");
-
-    }
-    catch(e){
-
-        console.error(e);
-
-        alert("Ошибка подписки push: " + e.message);
-
-    }
-
-}
+onMessage(messaging, (payload) => {
+  console.log("Message received:", payload);
+});

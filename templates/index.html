@@ -100,7 +100,20 @@ EpidMonitor
 
 </div>
 
-<script src="/static/app.js"></script>
+
+<script type="module" src="/static/app.js"></script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/firebase-messaging-sw.js')
+    .then(function(registration) {
+      console.log("Service Worker registered:", registration);
+    })
+    .catch(function(error) {
+      console.log("Service Worker error:", error);
+    });
+}
+</script>
 
 </body>
 </html>
