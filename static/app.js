@@ -1,4 +1,8 @@
-console.log("EpidMonitor Mobile loaded");
+function openModule(name){
+
+alert("Модуль \"" + name + "\" находится в разработке");
+
+}
 
 if ("serviceWorker" in navigator) {
 
